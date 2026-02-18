@@ -45,17 +45,24 @@
         .number-display { font-family: sans-serif; color: #7f8c8d; font-size: 0.95rem; direction: ltr; text-align: right; margin-top: 5px; }
         .call-btn { background-color: var(--call-color); color: white; text-decoration: none; padding: 10px 20px; border-radius: 50px; font-weight: 600; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
         
-        /* Map Section */
-        .map-container { margin-top: 40px; background: white; padding: 10px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .map-frame { width: 100%; height: 350px; border: 0; border-radius: 10px; }
+        /* Map Container: Keeps the white card look */
+        .map-container {
+            margin-top: 40px;
+            background: white;
+            padding: 10px; /* Spacing inside the white box */
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden; /* Ensures map doesn't spill out */
+        }
 
-        /* Feedback Form */
-        .feedback-form { background: white; padding: 20px; border-radius: 15px; margin-top: 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; }
-        .form-group input, .form-group textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 8px; font-family: 'Cairo', sans-serif; }
-        .submit-btn { background: var(--primary-color); color: white; border: none; padding: 10px 25px; border-radius: 50px; cursor: pointer; font-family: 'Cairo', sans-serif; }
-
+        /* Map Frame: Forces the map to fit perfectly */
+        .map-frame {
+            width: 100%;       /* Fills the width of the container */
+            height: 450px;     /* Fixed height that looks good on mobile & desktop */
+            border: 0;
+            border-radius: 10px; /* Rounds the corners of the map itself */
+            display: block;    /* Removes extra whitespace below the map */
+        }
         /* Installation Banner (for PWA) */
         #installBanner { display: none; background: #333; color: white; padding: 15px; position: fixed; bottom: 0; left: 0; right: 0; text-align: center; z-index: 1000; }
         #installBanner button { background: var(--accent-color); border: none; padding: 5px 15px; color: white; border-radius: 5px; margin-right: 10px; cursor: pointer; }
@@ -117,7 +124,7 @@
         <h2 class="section-title">خريطة المراكز الطبية</h2>
         <div class="map-container">
             <!-- Instructions to user: You need to replace the src below with your Google My Maps embed link -->
-<iframe src="https://www.google.com/maps/d/embed?mid=15dlbgQ6Gg4h46y23kzkhg8usVvX3fSU&ehbc=2E312F" width="640" height="480"></iframe>            <p style="font-size: 0.8rem; text-align: center; margin-top: 5px; color: #777;">* الخريطة تحتاج إلى انترنت للعمل</p>
+        <iframe src="https://www.google.com/maps/d/embed?mid=15dlbgQ6Gg4h46y23kzkhg8usVvX3fSU&ehbc=2E312F" width="640" height="480"></iframe>            <p style="font-size: 0.8rem; text-align: center; margin-top: 5px; color: #777;">* الخريطة تحتاج إلى انترنت للعمل</p>
         </div>
 
         <!-- Feedback Form -->
