@@ -10,7 +10,15 @@
     <meta property="og:description" content="أرقام الطوارئ والمشافي في مكان واحد">
     <meta property="og:image" content="./icon-512.png">
     <meta property="og:url" content="./">
-    
+    <!-- Content Security Policy: Whitelist only trusted sources -->
+    <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self'; 
+    script-src 'self' 'unsafe-inline' https://unpkg.com https://goatcounter.com https://gc.zgo.at; 
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://unpkg.com https://cdnjs.cloudflare.com; 
+    font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; 
+    img-src 'self' data: https://*.tile.openstreetmap.org https://unpkg.com; 
+    connect-src 'self' https://gc.zgo.at https://*.tile.openstreetmap.org;
+    form-action 'self' https://formspree.io;">
     <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c3e50">
@@ -37,18 +45,18 @@
         <h2 class="section-title">الطوارئ العاجلة</h2>
         <div id="emergencyGrid" class="grid"></div>
 
+        <!-- Hospitals Phone List (Added so they are searchable) -->
+        <h2 class="section-title">أرقام المشافي</h2>
+        <div id="hospitalGrid" class="grid"></div>
+
         <!-- Map Section -->
         <h2 class="section-title">خريطة المراكز الطبية</h2>
         <div class="map-container">
             <div id="map" class="map-frame"></div>
             <p class="map-note">
-                * الخريطة تحتاج اتصال بالإنترنت لتحميلها لأول مرة.
+                الخريطة تحتاج اتصال بالإنترنت.
             </p>
         </div>
-
-        <!-- Hospitals Phone List (Added so they are searchable) -->
-        <h2 class="section-title">أرقام المشافي</h2>
-        <div id="hospitalGrid" class="grid"></div>
 
         <!-- Feedback Form -->
         <h2 class="section-title">أضف رقم أو صحح معلومة</h2>
@@ -75,7 +83,11 @@
             <button id="btnCloseBanner" class="btn-outline">إغلاق</button>
         </div>
     </div>
-
+    <!-- Add this near the install banner -->
+    <div id="updateBanner" style="display:none; position:fixed; bottom:20px; left:20px; right:20px; background:#2c3e50; color:white; padding:15px; border-radius:8px; z-index:2001; text-align:center; box-shadow:0 4px 15px rgba(0,0,0,0.3);">
+        <p style="margin-bottom:10px;">يوجد تحديث جديد للبيانات</p>
+        <button id="btnRefresh" style="background:#e74c3c; border:none; color:white; padding:8px 15px; border-radius:4px; cursor:pointer;">تحديث الآن</button>
+    </div>
     <!-- Floating Share Button -->
     <a id="shareBtn" class="share-float" href="#" role="button" aria-label="Share">
         <i class="fab fa-whatsapp"></i>
@@ -92,5 +104,7 @@
     <!-- Scripts -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="app.js"></script>
+    <script data-goatcounter="https://tammams-analytics.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>

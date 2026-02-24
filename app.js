@@ -19,6 +19,14 @@ let map;
 let markers = [];
 let deferredPrompt;
 
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+    iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+    shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+});
+
+
 function initApp() {
     loadContacts();
     initMap();
@@ -141,25 +149,53 @@ function bindMapControls() {
     });
 
     // Locate User
-    document.getElementById("locateBtn").addEventListener("click", () => {
+    const locateBtn = document.getElementById("locateBtn");
+    locateBtn.addEventListener("click", () => {
+        setLoading(locateBtn, true);
+        
         if (!navigator.geolocation) {
             alert("المتصفح لا يدعم تحديد الموقع");
+            setLoading(locateBtn, false);
             return;
         }
-        navigator.geolocation.getCurrentPosition(pos => {
-            const { latitude, longitude } = pos.coords;
-            map.flyTo([latitude, longitude], 14);
-            L.marker([latitude, longitude]).bindPopup("أنت هنا").addTo(map).openPopup();
-        }, () => alert("يرجى السماح بالوصول إلى الموقع"));
+
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const { latitude, longitude } = pos.coords;
+                // Add a special blue dot for user
+                const userIcon = L.divIcon({
+                    className: 'user-location-dot',
+                    html: '<div style="width:15px;height:15px;background:#3498db;border:2px solid #fff;border-radius:50%;box-shadow:0 0 5px rgba(0,0,0,0.5);"></div>'
+                });
+
+                L.marker([latitude, longitude], {icon: userIcon})
+                    .addTo(map)
+                    .bindPopup("موقعك الحالي").openPopup();
+
+                map.setView([latitude, longitude], 13);
+                setLoading(locateBtn, false);
+            }, 
+            (err) => {
+                console.error(err);
+                alert("تعذر تحديد الموقع. يرجى تفعيل GPS.");
+                setLoading(locateBtn, false);
+            },
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
     });
 
     // Find Nearest Hospital
-    document.getElementById("nearestBtn").addEventListener("click", () => {
+    const nearestBtn = document.getElementById("nearestBtn");
+    nearestBtn.addEventListener("click", () => {
+        setLoading(nearestBtn, true);
+
         if (!navigator.geolocation) {
             alert("المتصفح لا يدعم تحديد الموقع");
+            setLoading(nearestBtn, false);
             return;
         }
-        navigator.geolocation.getCurrentPosition(pos => {
+
+        navigator.geolocation.getCurrentPosition((pos) => {
             const userLat = pos.coords.latitude;
             const userLng = pos.coords.longitude;
             
@@ -167,7 +203,7 @@ function bindMapControls() {
             let minDist = Infinity;
 
             hospitalsMapData.forEach(h => {
-                const dist = Math.sqrt(Math.pow(h.lat - userLat, 2) + Math.pow(h.lng - userLng, 2));
+                const dist = getDistanceFromLatLonInKm(userLat, userLng, h.lat, h.lng);
                 if (dist < minDist) {
                     minDist = dist;
                     nearest = h;
@@ -175,14 +211,55 @@ function bindMapControls() {
             });
 
             if (nearest) {
-                map.flyTo([nearest.lat, nearest.lng], 15);
-                // Find and click the marker to open popup
+                // Draw a line (Polyline) from user to hospital
+                const latlngs = [
+                    [userLat, userLng],
+                    [nearest.lat, nearest.lng]
+                ];
+                const polyline = L.polyline(latlngs, {color: 'blue', dashArray: '5, 10'}).addTo(map);
+                map.fitBounds(polyline.getBounds(), {padding: [50, 50]});
+
+                // Open the specific marker
                 const target = markers.find(m => m.data.name === nearest.name);
                 if(target) target.marker.openPopup();
-                alert(`أقرب مشفى هو: ${nearest.name}`);
+                
+                setLoading(nearestBtn, false);
             }
+        }, () => {
+            alert("يرجى تفعيل الموقع لمعرفة أقرب مشفى");
+            setLoading(nearestBtn, false);
         });
     });
+}
+
+// Helper: Haversine Formula for accurate distance
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  var R = 6371; // Radius of the earth in km
+  var dLat = deg2rad(lat2-lat1);  
+  var dLon = deg2rad(lon2-lon1); 
+  var a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2); 
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+  var d = R * c; 
+  return d;
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI/180)
+}
+
+function setLoading(btn, isLoading) {
+    if(isLoading) {
+        btn.setAttribute('disabled', 'true');
+        const originalText = btn.innerText;
+        btn.setAttribute('data-text', originalText);
+        btn.innerHTML = `جارِ العمل <div class="spinner"></div>`;
+    } else {
+        btn.removeAttribute('disabled');
+        btn.innerText = btn.getAttribute('data-text');
+    }
 }
 
 // --- 3. Search Logic ---
@@ -212,9 +289,33 @@ function initShare() {
 // --- 5. PWA Logic ---
 function initPWA() {
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js')
-            .then(() => console.log('Service Worker Registered'))
-            .catch(err => console.log('SW Registration Failed', err));
+        let newWorker;
+
+        navigator.serviceWorker.register('./sw.js').then(reg => {
+            // Check if there is an update waiting
+            reg.addEventListener('updatefound', () => {
+                newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        // Show Update Banner
+                        document.getElementById('updateBanner').style.display = 'block';
+                    }
+                });
+            });
+        });
+
+        let refreshing;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (refreshing) return;
+            window.location.reload();
+            refreshing = true;
+        });
+
+        document.getElementById('btnRefresh').addEventListener('click', () => {
+            if (newWorker) {
+                newWorker.postMessage({ action: 'skipWaiting' });
+            }
+        });
     }
 
     window.addEventListener('beforeinstallprompt', (e) => {

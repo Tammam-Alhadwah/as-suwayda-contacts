@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v4';
+const CACHE_VERSION = 'v5'; // Bumped version to trigger update
 const CACHE_NAME = `suwayda-emergency-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
@@ -10,10 +10,16 @@ const STATIC_ASSETS = [
     './contacts.json',
     './icon-192.png',
     './icon-512.png',
+    // External CSS/JS
     'https://unpkg.com/leaflet/dist/leaflet.css',
     'https://unpkg.com/leaflet/dist/leaflet.js',
     'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap',
-    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
+    // HIDDEN ASSETS (Required for offline mode)
+    'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/webfonts/fa-solid-900.woff2',
+    'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+    'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+    'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png'
 ];
 
 self.addEventListener('install', event => {
@@ -39,4 +45,10 @@ self.addEventListener('fetch', event => {
         caches.match(event.request)
             .then(response => response || fetch(event.request))
     );
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data.action === 'skipWaiting') {
+    self.skipWaiting();
+  }
 });
