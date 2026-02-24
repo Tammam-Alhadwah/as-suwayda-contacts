@@ -13,7 +13,8 @@
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <style>
         :root {
             --primary-color: #2c3e50;
@@ -83,47 +84,18 @@
     <div class="container">
         <!-- Emergency -->
         <h2 class="section-title">الطوارئ العاجلة</h2>
-        <div class="grid">
-            <div class="card" data-name="اسعاف هلال أحمر">
-                <div class="info"><div class="name">إسعاف الهلال الأحمر</div><div class="number-display">133</div></div>
-                <a href="tel:133" class="call-btn"><i class="fas fa-phone-alt"></i> اتصال</a>
-            </div>
-            <div class="card" data-name="شرطة نجدة">
-                <div class="info"><div class="name">الشرطة (النجدة)</div><div class="number-display">112</div></div>
-                <a href="tel:112" class="call-btn"><i class="fas fa-phone-alt"></i> اتصال</a>
-            </div>
-            <div class="card" data-name="اطفاء حريق">
-                <div class="info"><div class="name">فوج الإطفاء</div><div class="number-display">113</div></div>
-                <a href="tel:113" class="call-btn"><i class="fas fa-phone-alt"></i> اتصال</a>
-            </div>
-            <div class="card" data-name="كهرباء">
-                <div class="info"><div class="name">طوارئ الكهرباء</div><div class="number-display">117</div></div>
-                <a href="tel:117" class="call-btn"><i class="fas fa-phone-alt"></i> اتصال</a>
-            </div>
-        </div>
+        <div id="emergencyGrid" class="grid"></div>
 
         <!-- Hospitals -->
         <h2 class="section-title">المشافي</h2>
-        <div class="grid">
-            <div class="card" data-name="المشفى الوطني زيد الشريطي">
-                <div class="info"><div class="name">المشفى الوطني (زيد الشريطي)</div><div class="number-display">016-235590</div></div>
-                <a href="tel:016235590" class="call-btn"><i class="fas fa-phone-alt"></i> اتصال</a>
-            </div>
-            <div class="card" data-name="مشفى صلخد">
-                <div class="info"><div class="name">مشفى صلخد (الباسل)</div><div class="number-display">016-751804</div></div>
-                <a href="tel:016751804" class="call-btn"><i class="fas fa-phone-alt"></i> اتصال</a>
-            </div>
-            <div class="card" data-name="مشفى العناية">
-                <div class="info"><div class="name">مشفى العناية الخاص</div><div class="number-display">016-252333</div></div>
-                <a href="tel:016252333" class="call-btn"><i class="fas fa-phone-alt"></i> اتصال</a>
-            </div>
-        </div>
+        <div id="hospitalGrid" class="grid"></div>
 
-        <!-- Map Section -->
         <h2 class="section-title">خريطة المراكز الطبية</h2>
         <div class="map-container">
-            <!-- Instructions to user: You need to replace the src below with your Google My Maps embed link -->
-        <iframe src="https://www.google.com/maps/d/embed?mid=15dlbgQ6Gg4h46y23kzkhg8usVvX3fSU&ehbc=2E312F" height="400"></iframe>            <p style="font-size: 0.8rem; text-align: center; margin-top: 5px; color: #777;">* الخريطة تحتاج إلى انترنت للعمل</p>
+            <div id="map" class="map-frame"></div>
+            <p style="font-size:0.8rem;text-align:center;margin-top:5px;color:#777;">
+                * الخريطة تعمل بدون انترنت بعد التحميل الأول
+            </p>
         </div>
 
         <!-- Feedback Form -->
@@ -157,7 +129,7 @@
         
         <p style="margin-top: 10px; font-size: 0.9rem; direction: ltr;">
             Made with <i class="fas fa-heart" style="color: #e74c3c;"></i> by 
-            <a href="https://tammam-alhadwah.github.io" target="_blank" style="color: #2c3e50; text-decoration: none; font-weight: 700;">
+            <a href="https://tammam-alhadwah.github.io" target="_blank" style="color: #2c3e50; text-decoration: underline; font-weight: 700;">
                 Tammam Alhadwah
             </a>
         </p>
@@ -204,5 +176,104 @@
             }
         }
     </script>
+
+    <script>
+        const map = L.map('map').setView([32.7098, 36.5697], 8.5); // Suwayda coords
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19, minZoom: 8.5
+        }).addTo(map);
+
+        // Example markers
+        const locations = [
+            {name: "مشفى شهبا", lat: 32.85949480152474, lng: 36.62263367204663},
+            {name: "مشفى صلخد", lat: 32.492, lng: 36.702},
+            {name: "مشفى السلام", lat: 32.719843683672714, lng: 36.5681730050108},
+            {name: "مشفى المزرعة", lat: 32.71399439191677,  lng: 36.57321485417161},
+            {name: "المشفى الوطني", lat: 32.69869981613503, lng: 36.57960233458579},
+            {name: "مشفى العناية ", lat: 32.710505966394834, lng: 36.56960249468802},
+            {name :"مشفى الطب الحديث", lat: 32.71068723496513, lng: 36.583781728238556},
+            {name: "مشفى سالة", lat: 32.653299015034094, lng: 36.77690278092986},
+            {name: "مشفى الحكمة", lat: 32.70493024728266, lng: 36.574536976802776}
+        ];
+
+        locations.forEach(loc => {
+            L.marker([loc.lat, loc.lng])
+                .addTo(map)
+                .bindPopup(loc.name);
+        });
+    </script>
+
+    <script>
+        fetch('./contacts.json')
+        .then(res => res.json())
+        .then(data => {
+            const emergencycontainer = document.getElementById('emergencyGrid');
+            const hospitalcontainer = document.getElementById('hospitalGrid');
+
+            data.filter(c => c.category === "emergency")
+                .forEach(contact => {
+
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.setAttribute('data-name', contact.name);
+
+                    card.innerHTML = `
+                        <div class="info">
+                            <div class="name">${contact.name}</div>
+                            <div class="number-display">${contact.number}</div>
+                            <div class="verified-badge">
+                                آخر تحديث: ${contact.verified}
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <a href="tel:${contact.number}" class="call-btn">
+                                اتصال
+                            </a>
+                            <a href="https://wa.me/?text=${encodeURIComponent(contact.name + ' - ' + contact.number)}"
+                            target="_blank"
+                            class="call-btn"
+                            style="background:#25D366;">
+                                واتساب
+                            </a>
+                        </div>
+                    `;
+
+                    emergencycontainer.appendChild(card);
+                });
+
+            data.filter(c => c.category === "hospitals")
+                .forEach(contact => {
+
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.setAttribute('data-name', contact.name);
+
+                    card.innerHTML = `
+                        <div class="info">
+                            <div class="name">${contact.name}</div>
+                            <div class="number-display">${contact.number}</div>
+                            <div class="verified-badge">
+                                آخر تحديث: ${contact.verified}
+                            </div>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <a href="tel:${contact.number}" class="call-btn">
+                                اتصال
+                            </a>
+                            <a href="https://wa.me/?text=${encodeURIComponent(contact.name + ' - ' + contact.number)}"
+                            target="_blank"
+                            class="call-btn"
+                            style="background:#25D366;">
+                                واتساب
+                            </a>
+                        </div>
+                    `;
+
+                    hospitalcontainer.appendChild(card);
+                });
+        });
+    </script>
+
 </body>
 </html>

@@ -1,0 +1,44 @@
+[
+  {
+    "category": "emergency",
+    "name": "إسعاف الهلال الأحمر",
+    "number": "133",
+    "verified": "2026-02-01"
+  },
+  {
+    "category": "emergency",
+    "name": "الشرطة (النجدة)",
+    "number": "112",
+    "verified": "2026-01-20"
+  },
+  {
+    "category": "emergency",
+    "name": "فوج الإطفاء",
+    "number": "113",
+    "verified": "2026-01-20"
+  },
+  {
+    "category": "emergency",
+    "name": "طوارئ الكهرباء",
+    "number": "117",
+    "verified": "2026-01-20"
+  },
+  {
+    "category": "hospitals",
+    "name": "المشفى الوطني (زيد الشريطي)",
+    "number": "016-235590",
+    "verified": "2026-01-20"
+  },
+  {
+    "category": "hospitals",
+    "name": "مشفى صلخد (الباسل)",
+    "number": "016-751804",
+    "verified": "2026-01-20"
+  },
+  {
+    "category": "hospitals",
+    "name": "مشفى العناية الخاص",
+    "number": "016-252333",
+    "verified": "2026-01-20"
+  }
+]
