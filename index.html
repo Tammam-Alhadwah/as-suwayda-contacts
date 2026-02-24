@@ -3,189 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="دليل طوارئ السويداء">
-    <meta property="og:description" content="أرقام الطوارئ والمشافي في مكان واحد">
-    <meta property="og:image" content="https://yourdomain.com/icon-512.png">
-    <meta property="og:url" content="https://yourdomain.com/">
-    
     <title>دليل طوارئ السويداء</title>
     
-    <!-- PWA Manifest Link -->
+    <!-- SEO & Social -->
+    <meta property="og:title" content="دليل طوارئ السويداء">
+    <meta property="og:description" content="أرقام الطوارئ والمشافي في مكان واحد">
+    <meta property="og:image" content="./icon-512.png">
+    <meta property="og:url" content="./">
+    
+    <!-- PWA -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2c3e50">
     <link rel="apple-touch-icon" href="icon-192.png">
 
-    <!-- Fonts & Icons -->
+    <!-- Styles -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <style>
-        :root {
-            --primary-color: #2c3e50;
-            --accent-color: #e74c3c;
-            --call-color: #27ae60;
-            --bg-color: #f4f6f9;
-            --card-bg: #ffffff;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); color: #333; line-height: 1.6; padding-bottom: 60px; }
-
-        /* Header */
-        header { background: linear-gradient(135deg, #1a2a6c, #b21f1f); color: white; text-align: center; padding: 2rem 1rem 3rem; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px; }
-        header h1 { font-size: 1.8rem; margin-bottom: 0.5rem; }
-
-        /* Search */
-        .search-container { margin: -25px auto 30px; width: 90%; max-width: 600px; position: relative; }
-        #searchInput { width: 100%; padding: 15px 20px; border-radius: 50px; border: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); font-family: 'Cairo', sans-serif; font-size: 1rem; outline: none; text-align: right; }
-
-        /* Layout */
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 15px; }
-        .section-title { margin: 30px 0 15px; font-size: 1.3rem; color: var(--primary-color); border-right: 5px solid var(--accent-color); padding-right: 10px; font-weight: 700; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
-
-        /* Cards */
-        .card { background: var(--card-bg); border-radius: 12px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .name { font-weight: 700; font-size: 1.1rem; color: #2c3e50; }
-        .number-display { font-family: sans-serif; color: #7f8c8d; font-size: 0.95rem; direction: ltr; text-align: right; margin-top: 5px; }
-        .call-btn { background-color: var(--call-color); color: white; text-decoration: none; padding: 10px 20px; border-radius: 50px; font-weight: 600; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
-        
-        /* Map Container: Keeps the white card look */
-        .map-container {
-            margin-top: 40px;
-            background: white;
-            padding: 10px; /* Spacing inside the white box */
-            border-radius: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            overflow: hidden; /* Ensures map doesn't spill out */
-        }
-
-        /* Map Frame: Forces the map to fit perfectly */
-        .map-frame {
-            width: 100%;       /* Fills the width of the container */
-            height: 450px;     /* Fixed height that looks good on mobile & desktop */
-            border: 0;
-            border-radius: 10px; /* Rounds the corners of the map itself */
-            display: block;    /* Removes extra whitespace below the map */
-        }
-        .map-layout {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        @media (min-width: 900px) {
-            .map-layout {
-                flex-direction: row;
-            }
-
-            .map-frame {
-                flex: 2;
-            }
-
-            .hospital-list {
-                flex: 1;
-                max-height: 450px;
-            }
-        }
-
-            .custom-legend {
-                background: rgba(255, 255, 255, 0.55);   /* transparency */
-                
-                padding: 12px;
-                border-radius: 14px;
-                box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-                
-                width: 160px;
-                max-height: 40vh;                        /* key part */
-                overflow-y: auto;                        /* makes it scroll */
-                
-                font-family: 'Cairo', sans-serif;
-            }
-
-            .custom-legend strong {
-                display: block;
-                margin-bottom: 8px;
-                font-size: 0.95rem;
-            }
-
-            .legend-item {
-                padding: 6px 8px;
-                font-size: 0.85rem;
-                cursor: pointer;
-                border-radius: 6px;
-                margin-bottom: 4px;
-            }
-
-            .legend-item:hover {
-                background: #f0f2f5;
-            }
-
-            .legend-item.active {
-                background: #2c3e50;
-                color: white;
-            }
-            .custom-legend::-webkit-scrollbar {
-                width: 6px;
-            }
-
-            .custom-legend::-webkit-scrollbar-thumb {
-                background: rgba(0,0,0,0.2);
-                border-radius: 10px;
-            }
-        /* Installation Banner (for PWA) */
-        #installBanner { display: none; background: #333; color: white; padding: 15px; position: fixed; bottom: 0; left: 0; right: 0; text-align: center; z-index: 1000; }
-        #installBanner button { background: var(--accent-color); border: none; padding: 5px 15px; color: white; border-radius: 5px; margin-right: 10px; cursor: pointer; }
-        .share-float {
-            position: fixed;
-            bottom: 80px;
-            left: 20px;
-            background: #25D366;
-            color: white;
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            text-decoration: none;
-            z-index: 1000;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-        .legend-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-#toggleLegendBtn {
-    border: none;
-    background: transparent;
-    font-size: 18px;
-    cursor: pointer;
-}
-
-.legend-collapsed .legend-list,
-.legend-collapsed .legend-action {
-    display: none;
-}
-
-.legend-action {
-    width: 100%;
-    margin-top: 6px;
-    padding: 6px;
-    border: none;
-    background: #2c3e50;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-}
-        footer { text-align: center; padding: 30px; color: #7f8c8d; font-size: 0.8rem; margin-top: 40px; border-top: 1px solid #eee; }
-    </style>
-
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -194,311 +29,68 @@
     </header>
 
     <div class="search-container">
-        <input type="text" id="searchInput" placeholder="ابحث... (مثال: إطفاء، مشفى)" onkeyup="filterContacts()">
+        <input type="text" id="searchInput" placeholder="ابحث... (مثال: إطفاء، مشفى)">
     </div>
 
     <div class="container">
-        <!-- Emergency -->
+        <!-- Emergency Section -->
         <h2 class="section-title">الطوارئ العاجلة</h2>
         <div id="emergencyGrid" class="grid"></div>
 
-        <!-- Hospitals -->
+        <!-- Map Section -->
         <h2 class="section-title">خريطة المراكز الطبية</h2>
-
         <div class="map-container">
-            <div class="map-layout">
-                <div id="map" class="map-frame"></div>
-                <div id="hospitalList" class="hospital-list"></div>
-                <p style="font-size:0.8rem;text-align:center;margin-top:5px;color:#777;">
-                        * الخريطة تحتاج اتصال بالإنترنت لتحميلها و اللا سيكون حجم البرنامج كبير جدا.
-                    </p>
-            </div>
+            <div id="map" class="map-frame"></div>
+            <p class="map-note">
+                * الخريطة تحتاج اتصال بالإنترنت لتحميلها لأول مرة.
+            </p>
         </div>
-        
+
+        <!-- Hospitals Phone List (Added so they are searchable) -->
+        <h2 class="section-title">أرقام المشافي</h2>
+        <div id="hospitalGrid" class="grid"></div>
+
         <!-- Feedback Form -->
         <h2 class="section-title">أضف رقم أو صحح معلومة</h2>
         <div class="feedback-form">
-            <!-- Replace YOUR_EMAIL_HERE with your actual email if using a backend, or create a form on formspree.io and paste the URL in 'action' -->
             <form action="https://formspree.io/f/xlgwllgb" method="POST">
                 <div class="form-group">
                     <label>الاسم (اختياري)</label>
-                    <input type="text" name="name">
+                    <input type="text" name="name" class="form-input">
                 </div>
                 <div class="form-group">
                     <label>الاقتراح أو التصحيح</label>
-                    <textarea name="message" rows="3" required></textarea>
+                    <textarea name="message" rows="3" class="form-input" required></textarea>
                 </div>
                 <button type="submit" class="submit-btn">إرسال</button>
             </form>
         </div>
-
     </div>
 
     <!-- PWA Install Banner -->
     <div id="installBanner">
         <span>قم بتحميل التطبيق للوصول السريع بدون انترنت</span>
-        <button onclick="installPWA()">تحميل</button>
-        <button onclick="document.getElementById('installBanner').style.display='none'" style="background:transparent; border:1px solid #777;">إغلاق</button>
+        <div>
+            <button id="btnInstall">تحميل</button>
+            <button id="btnCloseBanner" class="btn-outline">إغلاق</button>
+        </div>
     </div>
+
+    <!-- Floating Share Button -->
+    <a id="shareBtn" class="share-float" href="#" role="button" aria-label="Share">
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
     <footer>
         <p>دليل السويداء للطوارئ | 2026</p>
-        
-        <p style="margin-top: 10px; font-size: 0.9rem; direction: ltr;">
-            Made with <i class="fas fa-heart" style="color: #e74c3c;"></i> by 
-            <a href="https://tammam-alhadwah.github.io" target="_blank" style="color: #2c3e50; text-decoration: underline; font-weight: 700;">
-                Tammam Alhadwah
-            </a>
+        <p class="credits">
+            Made with <i class="fas fa-heart"></i> by
+            <a href="https://tammam-alhadwah.github.io" target="_blank">Tammam Alhadwah</a>
         </p>
     </footer>
-    <a id="shareBtn" class="share-float">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-    <script>
-        // Search Filter
-        function filterContacts() {
-            let input = document.getElementById('searchInput').value.toUpperCase();
-            let cards = document.getElementsByClassName('card');
-            for (let i = 0; i < cards.length; i++) {
-                let name = cards[i].getAttribute('data-name');
-                cards[i].style.display = name.toUpperCase().indexOf(input) > -1 ? "flex" : "none";
-            }
-        }
 
-        // Service Worker Registration
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker Registered'))
-                    .catch(err => console.log('Service Worker Failed', err));
-            });
-        }
-
-        // PWA Install Logic
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-            // Only show banner if not already installed
-            if(!window.matchMedia('(display-mode: standalone)').matches) {
-                document.getElementById('installBanner').style.display = 'block';
-            }
-        });
-
-        function installPWA() {
-            document.getElementById('installBanner').style.display = 'none';
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    deferredPrompt = null;
-                });
-            }
-        }
-    </script>
-
-    <script>
-        const map = L.map('map', {
-            center: [32.7098, 36.5697],
-            zoom: 8.5,
-            attributionControl: false
-        });
-
-          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
-
-        L.control.attribution({
-            prefix: false
-        }).addTo(map)
-        
-        // Example markers
-        const hospitals = [
-            {name: "مشفى شهبا", lat: 32.85949480152474, lng: 36.62263367204663},
-            {name: "مشفى صلخد", lat: 32.492, lng: 36.702},
-            {name: "مشفى السلام", lat: 32.719843683672714, lng: 36.5681730050108},
-            {name: "مشفى المزرعة", lat: 32.71399439191677,  lng: 36.57321485417161},
-            {name: "المشفى الوطني", lat: 32.69869981613503, lng: 36.57960233458579},
-            {name: "مشفى العناية ", lat: 32.710505966394834, lng: 36.56960249468802},
-            {name: "مشفى الطب الحديث", lat: 32.71068723496513, lng: 36.583781728238556},
-            {name: "مشفى سالة", lat: 32.653299015034094, lng: 36.77690278092986},
-            {name: "مشفى الحكمة", lat: 32.70493024728266, lng: 36.574536976802776}
-        ];
-        const markers = [];
-let activeItem = null;
-
-// Create legend control
-const legendControl = L.control({ position: 'topright' });
-
-legendControl.onAdd = function () {
-    const div = L.DomUtil.create('div', 'custom-legend');
-
-    div.innerHTML = `
-        <div class="legend-header">
-            <strong>المشافي</strong>
-            <button id="toggleLegendBtn">−</button>
-        </div>
-        <div class="legend-list"></div>
-        <button id="locateBtn" class="legend-action">📍 موقعي</button>
-        <button id="nearestBtn" class="legend-action">🏥 أقرب مشفى</button>
-    `;
-
-    L.DomEvent.disableClickPropagation(div);
-    L.DomEvent.disableScrollPropagation(div);
-
-    return div;
-    };
-
-    legendControl.addTo(map);
-
-    const legendList = document.querySelector('.legend-list');
-    document.addEventListener("click", function(e) {
-        if (e.target.id === "toggleLegendBtn") {
-            const legend = document.querySelector('.custom-legend');
-            legend.classList.toggle('legend-collapsed');
-
-            e.target.textContent =
-                legend.classList.contains('legend-collapsed') ? '+' : '−';
-        }
-    });
-    hospitals.forEach(hospital => {
-
-    const marker = L.marker([hospital.lat, hospital.lng])
-        .addTo(map)
-        .bindPopup(`
-            ${hospital.name}
-            <br>
-            <a target="_blank"
-            href="https://www.google.com/maps?q=${hospital.lat},${hospital.lng}">
-            فتح في خرائط Google
-            </a>
-        `);
-
-    markers.push({ hospital, marker });
-
-    const item = document.createElement('div');
-    item.className = "legend-item";
-    item.textContent = hospital.name;
-
-    item.onclick = () => {
-        if (activeItem) activeItem.classList.remove('active');
-        item.classList.add('active');
-        activeItem = item;
-
-        map.flyTo([hospital.lat, hospital.lng], 15);
-        marker.openPopup();
-    };
-
-    legendList.appendChild(item);
-});
-    </script>
-
-    <script>
-        fetch('./contacts.json')
-        .then(res => res.json())
-        .then(data => {
-            const emergencycontainer = document.getElementById('emergencyGrid');
-            const hospitalcontainer = document.getElementById('hospitalGrid');
-
-            data.filter(c => c.category === "emergency")
-                .forEach(contact => {
-
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.setAttribute('data-name', contact.name);
-
-                    card.innerHTML = `
-                        <div class="info">
-                            <div class="name">${contact.name}</div>
-                            <div class="number-display">${contact.number}</div>
-                        </div>
-                        <div style="display:flex;gap:8px;">
-                            <a href="tel:${contact.number}" class="call-btn">
-                                اتصال
-                            </a>
-                            
-                        </div>
-                    `;
-
-                    emergencycontainer.appendChild(card);
-                });
-
-            data.filter(c => c.category === "hospitals")
-                .forEach(contact => {
-
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.setAttribute('data-name', contact.name);
-
-                    card.innerHTML = `
-                        <div class="info">
-                            <div class="name">${contact.name}</div>
-                            <div class="number-display">${contact.number}</div> 
-                        </div>
-                        <div style="display:flex;gap:8px;">
-                            <a href="tel:${contact.number}" class="call-btn">
-                                اتصال
-                            </a>
-                        </div>
-                    `;
-
-                    hospitalcontainer.appendChild(card);
-                });
-        });
-    </script>
-    <script>
-        document.getElementById("shareBtn").addEventListener("click", function () {
-
-            const pageUrl = window.location.href;
-
-            const message = `
-        دليل طوارئ السويداء 🚨
-        أرقام الطوارئ والمشافي في مكان واحد
-        يعمل حتى بدون انترنت بعد التحميل الأول
-
-        ${pageUrl}
-            `;
-
-            const whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(message);
-
-            window.open(whatsappUrl, "_blank");
-        });
-    </script>
-    <script>
-
-        let userLocation = null;
-
-document.addEventListener("click", function(e) {
-
-    if (e.target.id === "locateBtn") {
-
-        if (!navigator.geolocation) {
-            alert("المتصفح لا يدعم تحديد الموقع");
-            return;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-
-                userLocation = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-
-                map.flyTo([userLocation.lat, userLocation.lng], 14);
-
-                L.marker([userLocation.lat, userLocation.lng])
-                    .bindPopup("أنت هنا")
-                    .addTo(map)
-                    .openPopup();
-            },
-            function() {
-                alert("يرجى السماح بالوصول إلى الموقع");
-            }
-        );
-    }
-
-});
-    </script>
+    <!-- Scripts -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
