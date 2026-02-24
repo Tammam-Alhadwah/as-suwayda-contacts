@@ -1,9 +1,11 @@
-const CACHE_VERSION = 'v3';
+const CACHE_VERSION = 'v4';
 const CACHE_NAME = `suwayda-emergency-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
     './',
     './index.html',
+    './style.css',
+    './app.js',
     './manifest.json',
     './contacts.json',
     './icon-192.png',
@@ -25,8 +27,7 @@ self.addEventListener('activate', event => {
     event.waitUntil(
         caches.keys().then(keys =>
             Promise.all(
-                keys
-                    .filter(key => key !== CACHE_NAME)
+                keys.filter(key => key !== CACHE_NAME)
                     .map(key => caches.delete(key))
             )
         )

@@ -91,13 +91,16 @@
         }
 
             .custom-legend {
-                background: white;
-                padding: 10px;
-                border-radius: 12px;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-                width: 200px;
-                max-height: 250px;
-                overflow-y: auto;
+                background: rgba(255, 255, 255, 0.55);   /* transparency */
+                
+                padding: 12px;
+                border-radius: 14px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+                
+                width: 160px;
+                max-height: 40vh;                        /* key part */
+                overflow-y: auto;                        /* makes it scroll */
+                
                 font-family: 'Cairo', sans-serif;
             }
 
@@ -123,6 +126,14 @@
                 background: #2c3e50;
                 color: white;
             }
+            .custom-legend::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .custom-legend::-webkit-scrollbar-thumb {
+                background: rgba(0,0,0,0.2);
+                border-radius: 10px;
+            }
         /* Installation Banner (for PWA) */
         #installBanner { display: none; background: #333; color: white; padding: 15px; position: fixed; bottom: 0; left: 0; right: 0; text-align: center; z-index: 1000; }
         #installBanner button { background: var(--accent-color); border: none; padding: 5px 15px; color: white; border-radius: 5px; margin-right: 10px; cursor: pointer; }
@@ -143,6 +154,35 @@
             z-index: 1000;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
+        .legend-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+#toggleLegendBtn {
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.legend-collapsed .legend-list,
+.legend-collapsed .legend-action {
+    display: none;
+}
+
+.legend-action {
+    width: 100%;
+    margin-top: 6px;
+    padding: 6px;
+    border: none;
+    background: #2c3e50;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
         footer { text-align: center; padding: 30px; color: #7f8c8d; font-size: 0.8rem; margin-top: 40px; border-top: 1px solid #eee; }
     </style>
 
@@ -211,7 +251,9 @@
             </a>
         </p>
     </footer>
-
+    <a id="shareBtn" class="share-float">
+        <i class="fab fa-whatsapp"></i>
+    </a>
     <script>
         // Search Filter
         function filterContacts() {
@@ -269,6 +311,7 @@
         L.control.attribution({
             prefix: false
         }).addTo(map)
+        
         // Example markers
         const hospitals = [
             {name: "مشفى شهبا", lat: 32.85949480152474, lng: 36.62263367204663},
@@ -281,7 +324,6 @@
             {name: "مشفى سالة", lat: 32.653299015034094, lng: 36.77690278092986},
             {name: "مشفى الحكمة", lat: 32.70493024728266, lng: 36.574536976802776}
         ];
-
         const markers = [];
 let activeItem = null;
 
@@ -290,15 +332,36 @@ const legendControl = L.control({ position: 'topright' });
 
 legendControl.onAdd = function () {
     const div = L.DomUtil.create('div', 'custom-legend');
-    div.innerHTML = '<strong>المشافي</strong><div class="legend-list"></div>';
+
+    div.innerHTML = `
+        <div class="legend-header">
+            <strong>المشافي</strong>
+            <button id="toggleLegendBtn">−</button>
+        </div>
+        <div class="legend-list"></div>
+        <button id="locateBtn" class="legend-action">📍 موقعي</button>
+        <button id="nearestBtn" class="legend-action">🏥 أقرب مشفى</button>
+    `;
+
+    L.DomEvent.disableClickPropagation(div);
+    L.DomEvent.disableScrollPropagation(div);
+
     return div;
-};
+    };
 
-legendControl.addTo(map);
+    legendControl.addTo(map);
 
-const legendList = document.querySelector('.legend-list');
+    const legendList = document.querySelector('.legend-list');
+    document.addEventListener("click", function(e) {
+        if (e.target.id === "toggleLegendBtn") {
+            const legend = document.querySelector('.custom-legend');
+            legend.classList.toggle('legend-collapsed');
 
-hospitals.forEach(hospital => {
+            e.target.textContent =
+                legend.classList.contains('legend-collapsed') ? '+' : '−';
+        }
+    });
+    hospitals.forEach(hospital => {
 
     const marker = L.marker([hospital.lat, hospital.lng])
         .addTo(map)
@@ -401,9 +464,41 @@ hospitals.forEach(hospital => {
             window.open(whatsappUrl, "_blank");
         });
     </script>
-    
-    <a id="shareBtn" class="share-float">
-        <i class="fab fa-whatsapp"></i>
-    </a>
+    <script>
+
+        let userLocation = null;
+
+document.addEventListener("click", function(e) {
+
+    if (e.target.id === "locateBtn") {
+
+        if (!navigator.geolocation) {
+            alert("المتصفح لا يدعم تحديد الموقع");
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            function(position) {
+
+                userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                map.flyTo([userLocation.lat, userLocation.lng], 14);
+
+                L.marker([userLocation.lat, userLocation.lng])
+                    .bindPopup("أنت هنا")
+                    .addTo(map)
+                    .openPopup();
+            },
+            function() {
+                alert("يرجى السماح بالوصول إلى الموقع");
+            }
+        );
+    }
+
+});
+    </script>
 </body>
 </html>
