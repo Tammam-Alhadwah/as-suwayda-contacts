@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="دليل طوارئ السويداء">
+    <meta property="og:description" content="أرقام الطوارئ والمشافي في مكان واحد">
+    <meta property="og:image" content="https://yourdomain.com/icon-512.png">
+    <meta property="og:url" content="https://yourdomain.com/">
+    
     <title>دليل طوارئ السويداء</title>
     
     <!-- PWA Manifest Link -->
@@ -64,12 +69,83 @@
             border-radius: 10px; /* Rounds the corners of the map itself */
             display: block;    /* Removes extra whitespace below the map */
         }
+        .map-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        @media (min-width: 900px) {
+            .map-layout {
+                flex-direction: row;
+            }
+
+            .map-frame {
+                flex: 2;
+            }
+
+            .hospital-list {
+                flex: 1;
+                max-height: 450px;
+            }
+        }
+
+            .custom-legend {
+                background: white;
+                padding: 10px;
+                border-radius: 12px;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+                width: 200px;
+                max-height: 250px;
+                overflow-y: auto;
+                font-family: 'Cairo', sans-serif;
+            }
+
+            .custom-legend strong {
+                display: block;
+                margin-bottom: 8px;
+                font-size: 0.95rem;
+            }
+
+            .legend-item {
+                padding: 6px 8px;
+                font-size: 0.85rem;
+                cursor: pointer;
+                border-radius: 6px;
+                margin-bottom: 4px;
+            }
+
+            .legend-item:hover {
+                background: #f0f2f5;
+            }
+
+            .legend-item.active {
+                background: #2c3e50;
+                color: white;
+            }
         /* Installation Banner (for PWA) */
         #installBanner { display: none; background: #333; color: white; padding: 15px; position: fixed; bottom: 0; left: 0; right: 0; text-align: center; z-index: 1000; }
         #installBanner button { background: var(--accent-color); border: none; padding: 5px 15px; color: white; border-radius: 5px; margin-right: 10px; cursor: pointer; }
-
+        .share-float {
+            position: fixed;
+            bottom: 80px;
+            left: 20px;
+            background: #25D366;
+            color: white;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            text-decoration: none;
+            z-index: 1000;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
         footer { text-align: center; padding: 30px; color: #7f8c8d; font-size: 0.8rem; margin-top: 40px; border-top: 1px solid #eee; }
     </style>
+
 </head>
 <body>
 
@@ -87,17 +163,18 @@
         <div id="emergencyGrid" class="grid"></div>
 
         <!-- Hospitals -->
-        <h2 class="section-title">المشافي</h2>
-        <div id="hospitalGrid" class="grid"></div>
-
         <h2 class="section-title">خريطة المراكز الطبية</h2>
-        <div class="map-container">
-            <div id="map" class="map-frame"></div>
-            <p style="font-size:0.8rem;text-align:center;margin-top:5px;color:#777;">
-                * الخريطة تعمل بدون انترنت بعد التحميل الأول
-            </p>
-        </div>
 
+        <div class="map-container">
+            <div class="map-layout">
+                <div id="map" class="map-frame"></div>
+                <div id="hospitalList" class="hospital-list"></div>
+                <p style="font-size:0.8rem;text-align:center;margin-top:5px;color:#777;">
+                        * الخريطة تحتاج اتصال بالإنترنت لتحميلها و اللا سيكون حجم البرنامج كبير جدا.
+                    </p>
+            </div>
+        </div>
+        
         <!-- Feedback Form -->
         <h2 class="section-title">أضف رقم أو صحح معلومة</h2>
         <div class="feedback-form">
@@ -178,30 +255,79 @@
     </script>
 
     <script>
-        const map = L.map('map').setView([32.7098, 36.5697], 8.5); // Suwayda coords
+        const map = L.map('map', {
+            center: [32.7098, 36.5697],
+            zoom: 8.5,
+            attributionControl: false
+        });
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19, minZoom: 8.5
-        }).addTo(map);
+          L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
 
+        L.control.attribution({
+            prefix: false
+        }).addTo(map)
         // Example markers
-        const locations = [
+        const hospitals = [
             {name: "مشفى شهبا", lat: 32.85949480152474, lng: 36.62263367204663},
             {name: "مشفى صلخد", lat: 32.492, lng: 36.702},
             {name: "مشفى السلام", lat: 32.719843683672714, lng: 36.5681730050108},
             {name: "مشفى المزرعة", lat: 32.71399439191677,  lng: 36.57321485417161},
             {name: "المشفى الوطني", lat: 32.69869981613503, lng: 36.57960233458579},
             {name: "مشفى العناية ", lat: 32.710505966394834, lng: 36.56960249468802},
-            {name :"مشفى الطب الحديث", lat: 32.71068723496513, lng: 36.583781728238556},
+            {name: "مشفى الطب الحديث", lat: 32.71068723496513, lng: 36.583781728238556},
             {name: "مشفى سالة", lat: 32.653299015034094, lng: 36.77690278092986},
             {name: "مشفى الحكمة", lat: 32.70493024728266, lng: 36.574536976802776}
         ];
 
-        locations.forEach(loc => {
-            L.marker([loc.lat, loc.lng])
-                .addTo(map)
-                .bindPopup(loc.name);
-        });
+        const markers = [];
+let activeItem = null;
+
+// Create legend control
+const legendControl = L.control({ position: 'topright' });
+
+legendControl.onAdd = function () {
+    const div = L.DomUtil.create('div', 'custom-legend');
+    div.innerHTML = '<strong>المشافي</strong><div class="legend-list"></div>';
+    return div;
+};
+
+legendControl.addTo(map);
+
+const legendList = document.querySelector('.legend-list');
+
+hospitals.forEach(hospital => {
+
+    const marker = L.marker([hospital.lat, hospital.lng])
+        .addTo(map)
+        .bindPopup(`
+            ${hospital.name}
+            <br>
+            <a target="_blank"
+            href="https://www.google.com/maps?q=${hospital.lat},${hospital.lng}">
+            فتح في خرائط Google
+            </a>
+        `);
+
+    markers.push({ hospital, marker });
+
+    const item = document.createElement('div');
+    item.className = "legend-item";
+    item.textContent = hospital.name;
+
+    item.onclick = () => {
+        if (activeItem) activeItem.classList.remove('active');
+        item.classList.add('active');
+        activeItem = item;
+
+        map.flyTo([hospital.lat, hospital.lng], 15);
+        marker.openPopup();
+    };
+
+    legendList.appendChild(item);
+});
     </script>
 
     <script>
@@ -222,20 +348,12 @@
                         <div class="info">
                             <div class="name">${contact.name}</div>
                             <div class="number-display">${contact.number}</div>
-                            <div class="verified-badge">
-                                آخر تحديث: ${contact.verified}
-                            </div>
                         </div>
                         <div style="display:flex;gap:8px;">
                             <a href="tel:${contact.number}" class="call-btn">
                                 اتصال
                             </a>
-                            <a href="https://wa.me/?text=${encodeURIComponent(contact.name + ' - ' + contact.number)}"
-                            target="_blank"
-                            class="call-btn"
-                            style="background:#25D366;">
-                                واتساب
-                            </a>
+                            
                         </div>
                     `;
 
@@ -252,20 +370,11 @@
                     card.innerHTML = `
                         <div class="info">
                             <div class="name">${contact.name}</div>
-                            <div class="number-display">${contact.number}</div>
-                            <div class="verified-badge">
-                                آخر تحديث: ${contact.verified}
-                            </div>
+                            <div class="number-display">${contact.number}</div> 
                         </div>
                         <div style="display:flex;gap:8px;">
                             <a href="tel:${contact.number}" class="call-btn">
                                 اتصال
-                            </a>
-                            <a href="https://wa.me/?text=${encodeURIComponent(contact.name + ' - ' + contact.number)}"
-                            target="_blank"
-                            class="call-btn"
-                            style="background:#25D366;">
-                                واتساب
                             </a>
                         </div>
                     `;
@@ -274,6 +383,27 @@
                 });
         });
     </script>
+    <script>
+        document.getElementById("shareBtn").addEventListener("click", function () {
 
+            const pageUrl = window.location.href;
+
+            const message = `
+        دليل طوارئ السويداء 🚨
+        أرقام الطوارئ والمشافي في مكان واحد
+        يعمل حتى بدون انترنت بعد التحميل الأول
+
+        ${pageUrl}
+            `;
+
+            const whatsappUrl = "https://wa.me/?text=" + encodeURIComponent(message);
+
+            window.open(whatsappUrl, "_blank");
+        });
+    </script>
+    
+    <a id="shareBtn" class="share-float">
+        <i class="fab fa-whatsapp"></i>
+    </a>
 </body>
 </html>
