@@ -17,6 +17,7 @@ const hospitalsMapData = [
 
 let map;
 let markers = [];
+let currentUserMarker = null; // Track user marker to prevent duplicates
 let deferredPrompt;
 
 delete L.Icon.Default.prototype._getIconUrl;
@@ -111,7 +112,7 @@ function initMap() {
 
     // Populate Markers & Legend Items
     const legendList = document.getElementById('legendList');
-    
+
     hospitalsMapData.forEach(hospital => {
         // Marker
         const marker = L.marker([hospital.lat, hospital.lng]).addTo(map);
@@ -152,7 +153,7 @@ function bindMapControls() {
     const locateBtn = document.getElementById("locateBtn");
     locateBtn.addEventListener("click", () => {
         setLoading(locateBtn, true);
-        
+
         if (!navigator.geolocation) {
             alert("المتصفح لا يدعم تحديد الموقع");
             setLoading(locateBtn, false);
@@ -162,19 +163,25 @@ function bindMapControls() {
         navigator.geolocation.getCurrentPosition(
             (pos) => {
                 const { latitude, longitude } = pos.coords;
+                
+                // Remove existing marker if it exists
+                if (currentUserMarker) {
+                    map.removeLayer(currentUserMarker);
+                }
+
                 // Add a special blue dot for user
                 const userIcon = L.divIcon({
                     className: 'user-location-dot',
                     html: '<div style="width:15px;height:15px;background:#3498db;border:2px solid #fff;border-radius:50%;box-shadow:0 0 5px rgba(0,0,0,0.5);"></div>'
                 });
 
-                L.marker([latitude, longitude], {icon: userIcon})
+                currentUserMarker = L.marker([latitude, longitude], {icon: userIcon})
                     .addTo(map)
                     .bindPopup("موقعك الحالي").openPopup();
 
                 map.setView([latitude, longitude], 13);
                 setLoading(locateBtn, false);
-            }, 
+            },
             (err) => {
                 console.error(err);
                 alert("تعذر تحديد الموقع. يرجى تفعيل GPS.");
@@ -198,7 +205,7 @@ function bindMapControls() {
         navigator.geolocation.getCurrentPosition((pos) => {
             const userLat = pos.coords.latitude;
             const userLng = pos.coords.longitude;
-            
+
             let nearest = null;
             let minDist = Infinity;
 
@@ -211,18 +218,23 @@ function bindMapControls() {
             });
 
             if (nearest) {
-                // Draw a line (Polyline) from user to hospital
-                const latlngs = [
-                    [userLat, userLng],
-                    [nearest.lat, nearest.lng]
-                ];
-                const polyline = L.polyline(latlngs, {color: 'blue', dashArray: '5, 10'}).addTo(map);
-                map.fitBounds(polyline.getBounds(), {padding: [50, 50]});
+                // 1. Highlight in Legend (simulate selection)
+                const legendItems = document.querySelectorAll('.legend-item');
+                legendItems.forEach(el => {
+                    el.classList.remove('active');
+                    // Check if text content matches hospital name
+                    if (el.textContent === nearest.name) {
+                        el.classList.add('active');
+                        // Scroll list to show this item
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
 
-                // Open the specific marker
+                // 2. Fly to Hospital and Open Popup
+                map.flyTo([nearest.lat, nearest.lng], 15);
                 const target = markers.find(m => m.data.name === nearest.name);
                 if(target) target.marker.openPopup();
-                
+
                 setLoading(nearestBtn, false);
             }
         }, () => {
@@ -235,14 +247,14 @@ function bindMapControls() {
 // Helper: Haversine Formula for accurate distance
 function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
   var R = 6371; // Radius of the earth in km
-  var dLat = deg2rad(lat2-lat1);  
-  var dLon = deg2rad(lon2-lon1); 
-  var a = 
+  var dLat = deg2rad(lat2-lat1);
+  var dLon = deg2rad(lon2-lon1);
+  var a =
     Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2); 
-  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
-  var d = R * c; 
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  var d = R * c;
   return d;
 }
 
@@ -268,7 +280,7 @@ function initSearch() {
     input.addEventListener('keyup', () => {
         const filter = input.value.toUpperCase();
         const cards = document.getElementsByClassName('card');
-        
+
         for (let i = 0; i < cards.length; i++) {
             const name = cards[i].getAttribute('data-name');
             cards[i].style.display = name.toUpperCase().indexOf(filter) > -1 ? "flex" : "none";
