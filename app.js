@@ -301,35 +301,47 @@ function initShare() {
 // --- 5. PWA Logic ---
 function initPWA() {
     if ('serviceWorker' in navigator) {
-        let newWorker;
-
+        
         navigator.serviceWorker.register('./sw.js').then(reg => {
-            // Check if there is an update waiting
+            
+            // 1. Check if update is ALREADY waiting (The fix)
+            if (reg.waiting) {
+                document.getElementById('updateBanner').style.display = 'block';
+            }
+
+            // 2. Check if update is found NOW
             reg.addEventListener('updatefound', () => {
-                newWorker = reg.installing;
+                const newWorker = reg.installing;
                 newWorker.addEventListener('statechange', () => {
                     if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                        // Show Update Banner
                         document.getElementById('updateBanner').style.display = 'block';
                     }
                 });
             });
         });
 
+        // 3. Handle the "Refresh" button click
+        document.getElementById('btnRefresh').addEventListener('click', () => {
+            navigator.serviceWorker.getRegistration().then(reg => {
+                if (reg && reg.waiting) {
+                    // Tell the waiting worker to take over immediately
+                    reg.waiting.postMessage({ action: 'skipWaiting' });
+                } else {
+                    window.location.reload(); 
+                }
+            });
+        });
+
+        // 4. Reload page when the new worker takes control
         let refreshing;
         navigator.serviceWorker.addEventListener('controllerchange', () => {
             if (refreshing) return;
             window.location.reload();
             refreshing = true;
         });
-
-        document.getElementById('btnRefresh').addEventListener('click', () => {
-            if (newWorker) {
-                newWorker.postMessage({ action: 'skipWaiting' });
-            }
-        });
     }
 
+    // --- Install Banner Logic (Unchanged) ---
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
