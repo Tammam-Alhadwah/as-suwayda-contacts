@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v11'; // Bumped version to trigger update
+const CACHE_VERSION = 'v12'; // Bumped version to trigger update
 const CACHE_NAME = `suwayda-emergency-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [

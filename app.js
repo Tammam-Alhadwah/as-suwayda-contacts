@@ -60,15 +60,45 @@ function createCard(contact) {
     const card = document.createElement('div');
     card.className = 'card';
     card.setAttribute('data-name', contact.name);
-    card.innerHTML = `
-        <div class="info">
-            <div class="name">${contact.name}</div>
-            <div class="number-display">${contact.number}</div>
-        </div>
-        <div>
+
+    // 1. Handle Multiple Numbers (Array) vs Single Number (String)
+    let numberDisplay = "";
+    let actionButtons = "";
+
+    if (Array.isArray(contact.number)) {
+        // It is an array (e.g. Red Crescent)
+        // Join numbers with a slash for display: "133 / 016-xxxx"
+        numberDisplay = contact.number.join(', ');
+
+        // Create a button for EACH number
+        contact.number.forEach(num => {
+            actionButtons += `
+                <a href="tel:${num}" class="call-btn" style="margin-top:5px; font-size:0.8rem;">
+                    <i class="fas fa-phone-alt"></i> ${num}
+                </a>
+            `;
+        });
+        // Wrap buttons in a column so they stack nicely
+        actionButtons = `<div style="display:flex; flex-direction:column; gap:5px;">${actionButtons}</div>`;
+
+    } else {
+        // It is a single string (Standard contact)
+        numberDisplay = contact.number;
+        actionButtons = `
             <a href="tel:${contact.number}" class="call-btn">
                 <i class="fas fa-phone-alt"></i> اتصال
             </a>
+        `;
+    }
+
+    // 2. Build the Card HTML
+    card.innerHTML = `
+        <div class="info">
+            <div class="name">${contact.name}</div>
+            <div class="number-display">${numberDisplay}</div>
+        </div>
+        <div>
+            ${actionButtons}
         </div>
     `;
     return card;
