@@ -32,18 +32,65 @@ button:active, .card:active, .call-btn:active {
 .name { font-weight: 700; font-size: 1.1rem; color: #2c3e50; }
 .number-display { font-family: sans-serif; color: #7f8c8d; font-size: 0.95rem; direction: ltr; text-align: right; margin-top: 5px; }
 .call-btn { background-color: var(--call-color); color: white; text-decoration: none; padding: 10px 20px; border-radius: 50px; font-weight: 600; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; white-space: nowrap; }
-
-.promo-card {
-    background: linear-gradient(to left, #f8faff, #ffffff); /* خلفية زرقاء فاتحة جداً */
-    border: 1px solid #e1e8ed;
-    border-right: 5px solid #2980b9; /* خط أزرق مميز على اليمين */
+/* ClinicBook Promo Banner (After Map) */
+.promo-banner {
+    background: linear-gradient(135deg, #f0f7ff, #ffffff);
+    border: 1px solid #d4e4f7;
+    border-right: 5px solid #2980b9;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 30px 0 10px 0; /* Adds space between the map and the form */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
 }
 
-/* لضمان أن النص الطويل في البطاقة الإعلانية يلتف بشكل صحيح ولا يخرج عن الإطار */
-.promo-card .number-display {
-    line-height: 1.4;
+.promo-title {
+    color: #2980b9;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 5px;
 }
 
+.promo-desc {
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.promo-btn {
+    background-color: #25D366;
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    transition: transform 0.2s;
+}
+
+.promo-btn:hover {
+    transform: scale(1.05);
+}
+
+/* Mobile adjustments */
+@media (max-width: 600px) {
+    .promo-banner {
+        flex-direction: column;
+        text-align: right;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    .promo-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
 /* Map */
 .spinner {
     display: inline-block;
