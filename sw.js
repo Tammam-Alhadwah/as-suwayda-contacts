@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v9'; // Bumped version to trigger update
+const CACHE_VERSION = 'v10'; // Bumped version to trigger update
 const CACHE_NAME = `suwayda-emergency-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
@@ -8,8 +8,8 @@ const STATIC_ASSETS = [
     './app.js',
     './manifest.json',
     './contacts.json',
-    './iconV2-192.png',
-    './iconV2-512.png',
+    './iconV2-192.png?v=10',
+    './iconV2-192.png?v=10',
     // External CSS/JS
     'https://unpkg.com/leaflet/dist/leaflet.css',
     'https://unpkg.com/leaflet/dist/leaflet.js',
@@ -26,6 +26,7 @@ self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => cache.addAll(STATIC_ASSETS))
+            .then(() => self.skipWaiting())
     );
 });
 
@@ -36,7 +37,7 @@ self.addEventListener('activate', event => {
                 keys.filter(key => key !== CACHE_NAME)
                     .map(key => caches.delete(key))
             )
-        )
+        ).then(() => self.clients.claim())
     );
 });
 
