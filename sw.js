@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v10'; // Bumped version to trigger update
+const CACHE_VERSION = 'v11'; // Bumped version to trigger update
 const CACHE_NAME = `suwayda-emergency-${CACHE_VERSION}`;
 
 const STATIC_ASSETS = [
@@ -8,8 +8,8 @@ const STATIC_ASSETS = [
     './app.js',
     './manifest.json',
     './contacts.json',
-    './iconV2-192.png?v=10',
-    './iconV2-192.png?v=10',
+    './iconV3-192.png?v=11',
+    './iconV2-512.png?v=11',
     // External CSS/JS
     'https://unpkg.com/leaflet/dist/leaflet.css',
     'https://unpkg.com/leaflet/dist/leaflet.js',
