@@ -33,6 +33,17 @@ button:active, .card:active, .call-btn:active {
 .number-display { font-family: sans-serif; color: #7f8c8d; font-size: 0.95rem; direction: ltr; text-align: right; margin-top: 5px; }
 .call-btn { background-color: var(--call-color); color: white; text-decoration: none; padding: 10px 20px; border-radius: 50px; font-weight: 600; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; white-space: nowrap; }
 
+.promo-card {
+    background: linear-gradient(to left, #f8faff, #ffffff); /* خلفية زرقاء فاتحة جداً */
+    border: 1px solid #e1e8ed;
+    border-right: 5px solid #2980b9; /* خط أزرق مميز على اليمين */
+}
+
+/* لضمان أن النص الطويل في البطاقة الإعلانية يلتف بشكل صحيح ولا يخرج عن الإطار */
+.promo-card .number-display {
+    line-height: 1.4;
+}
+
 /* Map */
 .spinner {
     display: inline-block;

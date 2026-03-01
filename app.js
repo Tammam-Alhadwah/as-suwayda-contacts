@@ -38,12 +38,39 @@ function initApp() {
 
 // --- 1. Load Contacts from JSON ---
 function loadContacts() {
+
     fetch('./contacts.json')
     .then(res => res.json())
     .then(data => {
         const emergencyContainer = document.getElementById('emergencyGrid');
         const hospitalContainer = document.getElementById('hospitalGrid');
 
+        // --- إضافة بطاقة إعلان ClinicBook للأطباء ---
+        // 1. ضع رقمك هنا (مع رمز الدولة بدون +، مثال لسوريا: 9639xxxxxxxx)
+        const myWhatsAppNumber = "963995797309"; 
+        
+        // 2. الرسالة الجاهزة التي ستصلك
+        const waMessage = "مرحباً، أنا طبيب/ة ومهتم/ة بتجربة نظام ClinicBook لأتمتة مواعيد عيادتي.";
+        const encodedMessage = encodeURIComponent(waMessage);
+        const waUrl = `https://wa.me/${myWhatsAppNumber}?text=${encodedMessage}`;
+
+        const promoCard = document.createElement('div');
+        promoCard.className = 'card promo-card'; // Add specific CSS for this
+        promoCard.innerHTML = `
+        <div class="info">
+            <div class="promo-card" style="color: #2980b9;">خدمة للأطباء 👨‍⚕️</div>
+            <div class="number-display" style="font-size: 0.8rem; color: #555;">
+             نظم مواعيد عيادتك إلكترونياً و تلقائياً مع   
+            ClinicBook 
+            </div>
+        </div>
+        <div>
+            <a href="${waUrl}" target="_blank" class="call-btn" style="background-color: #2980b9;">
+                تفاصيل
+            </a>
+        </div>
+        `;
+        hospitalContainer.appendChild(promoCard);
         data.forEach(contact => {
             const card = createCard(contact);
             if (contact.category === "emergency") {
