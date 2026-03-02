@@ -31,6 +31,12 @@
   },
   {
     "category": "hospitals",
+    "name": "مشفى الحكمة",
+    "number": ["016-214777", "214488"],
+    "verified": "2026-01-20"
+  },
+  {
+    "category": "hospitals",
     "name": "المشفى الوطني (زيد الشريطي)",
     "number": "016-235590",
     "verified": "2026-01-20"
