@@ -35,6 +35,8 @@ function initApp() {
     initShare();
     initPWA();
 }
+
+// --- 1. Load Contacts from JSON ---
 function loadContacts() {
     fetch('./contacts.json')
     .then(res => res.json())
@@ -42,7 +44,6 @@ function loadContacts() {
         const emergencyContainer = document.getElementById('emergencyGrid');
         const hospitalContainer = document.getElementById('hospitalGrid');
 
-        // --- Load regular contacts ---
         data.forEach(contact => {
             const card = createCard(contact);
             if (contact.category === "emergency") {
@@ -51,38 +52,9 @@ function loadContacts() {
                 hospitalContainer.appendChild(card);
             }
         });
-
-        // --- Create ClinicBook Promo Banner (Outside the grid) ---
-        const myWhatsAppNumber = "963995797309"; 
-        const waMessage = "مرحباً، أنا طبيب/ة ومهتم/ة بنظام ClinicBook لأتمتة مواعيد عيادتي.";
-        const encodedMessage = encodeURIComponent(waMessage);
-        const waUrl = `https://wa.me/${myWhatsAppNumber}?text=${encodedMessage}`;
-
-        const promoBanner = document.createElement('div');
-        promoBanner.className = 'promo-banner'; // Using a new banner class
-        promoBanner.innerHTML = `
-            <div class="promo-info">
-                <div class="promo-title">هل أنت طبيب؟ 👨‍⚕️</div>
-                <div class="promo-desc">
-                    صممنا ClinicBook خصيصاً لإدارة حجوزات عيادتك. تواصل معنا لتجربة مجانية ودعم كامل!
-                </div>
-            </div>
-            <div>
-                <a href="${waUrl}" target="_blank" class="promo-btn"  style="background-color: #2980b9;">
-                    <i class="fas fa-info-circle"></i> تفاصيل
-                </a>
-            </div>
-        `;
-        
-        // Find the map container and insert the banner right AFTER it
-        const mapContainer = document.querySelector('.map-container');
-        if (mapContainer) {
-            mapContainer.insertAdjacentElement('afterend', promoBanner);
-        }
     })
     .catch(err => console.error("Error loading contacts:", err));
 }
-
 
 function createCard(contact) {
     const card = document.createElement('div');
