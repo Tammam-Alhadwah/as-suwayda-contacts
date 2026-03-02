@@ -1,6 +1,12 @@
 [
   {
     "category": "emergency",
+    "name": "قياده الشرطه (اي طارئ / اجسام مشبوهه)",
+    "number": "016108",
+    "verified": "2026-02-01"
+  },
+  {
+    "category": "emergency",
     "name": "إسعاف الهلال الأحمر",
     "number": ["133", "0947133133"],
     "verified": "2026-02-01"

@@ -64,12 +64,12 @@ function loadContacts() {
             <div class="promo-info">
                 <div class="promo-title">هل أنت طبيب؟ 👨‍⚕️</div>
                 <div class="promo-desc">
-                    صممنا ClinicBook خصيصاً لإدارة حجوزات عيادتك.
+                    صممنا ClinicBook خصيصاً لإدارة حجوزات عيادتك. تواصل معنا لتجربة مجانية ودعم كامل!
                 </div>
             </div>
             <div>
-                <a href="${waUrl}" target="_blank" class="promo-btn">
-                    <i class="fab fa-whatsapp"></i> تفاصيل
+                <a href="${waUrl}" target="_blank" class="promo-btn"  style="background-color: #2980b9;">
+                    <i class="fas fa-info-circle"></i> تفاصيل
                 </a>
             </div>
         `;
